@@ -7,9 +7,8 @@ namespace ConsoleApp2.Domain;
 
 public class UnixSession : UdsSession
 {
-    private readonly Subject<ClientMessage> _subject;
-
     private readonly ISerialize _serialize;
+    private readonly Subject<ClientMessage> _subject;
     public UnixSession(UnixServer server, ISerialize serialize, Subject<ClientMessage> subject) : base(server)
     {
         _serialize = serialize;
@@ -18,8 +17,9 @@ public class UnixSession : UdsSession
 
     protected override void OnReceived(byte[] buffer, long offset, long size)
     {
-        var data = _serialize.Deserialize(buffer, (int)offset, (int)size);
-        if (data != null)
-            _subject.OnNext(new ClientMessage(Id, data));
+        foreach(var value in _serialize.Deserialize(buffer, (int)offset, (int)size))
+        {
+            _subject.OnNext(new ClientMessage(Id, value));
+        }
     }
 }

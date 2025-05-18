@@ -5,5 +5,5 @@ namespace ConsoleApp2.Serialize;
 public interface ISerialize
 {
     public byte[] Serialize(IMessage message);
-    public IMessage Deserialize(byte[] buffer, int offset, int size);
+    public IEnumerable<IMessage> Deserialize(byte[] buffer, int offset, int size);
 }

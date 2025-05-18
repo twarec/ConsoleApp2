@@ -6,4 +6,6 @@ public interface IServer : IObservable<ClientMessage>
 {
     public void Send(IMessage message);
     public Task SendAsync(IMessage message);
+
+    public Task StartAsync();
 }

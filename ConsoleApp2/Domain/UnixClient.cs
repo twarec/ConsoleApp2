@@ -17,9 +17,10 @@ public class UnixClient : UdsClient, IClient
 
     protected override void OnReceived(byte[] buffer, long offset, long size)
     {
-        var data = _serialize.Deserialize(buffer, (int)offset, (int)size);
-        if (data != null)
-            _subject.OnNext(data);
+        foreach(var value in _serialize.Deserialize(buffer, (int)offset, (int)size))
+        {
+            _subject.OnNext(value);
+        }
     }
 
     public override long Receive(byte[] buffer, long offset, long size)
@@ -37,8 +38,20 @@ public class UnixClient : UdsClient, IClient
         return _subject.Subscribe(observer);
     }
 
-    protected override void OnConnected()
+    public Task StartAsync()
     {
-        Send(_serialize.Serialize(new Test_data(Guid.NewGuid(), "feafaafa")));
+        ConnectAsync();
+        return Task.CompletedTask;
+    }
+
+    public void Send(IMessage message)
+    {
+        base.Send(_serialize.Serialize(message));
+    }
+
+    public Task SendAsync(IMessage message)
+    {
+        base.SendAsync(_serialize.Serialize(message));
+        return Task.CompletedTask;
     }
 }
